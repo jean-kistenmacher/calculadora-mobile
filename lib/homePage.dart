@@ -192,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           hintText: 'Dose prescrita',
-                          suffixText: '(mg|UI)'),
+                          suffixText: '(mg ou UI)'),
                     ),
                   ),
                   const SizedBox(
@@ -246,9 +246,38 @@ class _HomePageState extends State<HomePage> {
       isLoading = false;
     });
 
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ResultPage(resultado: resultado)));
+    if (resultado.naoEncontrado) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.warning,
+                    color: Colors.orange), // Add your desired icon here
+                SizedBox(width: 8.0), // Adjust spacing as needed
+                Text('Atenção'),
+              ],
+            ),
+            content: const Text(
+                'Está diluição não está cadastrada no sistema! Entre em contato com o farmacêutico responsável.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Close the alert dialog
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ResultPage(resultado: resultado)));
+    }
   }
 }

@@ -205,7 +205,7 @@ class CalculadoraService {
       final data = jsonDecode(response.body);
 
       if (data.containsKey('naoEncontrado')) {
-        if (data.naoEncontrado) {
+        if (data['naoEncontrado']) {
           final Resultado resultadoNaoEncontrado =
               Resultado.customConstructor(true);
           return resultadoNaoEncontrado;

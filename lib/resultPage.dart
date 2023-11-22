@@ -82,7 +82,7 @@ class ResultPage extends StatelessWidget {
                       height: 15,
                     ),
                     Text(
-                      'Estbilidade:',
+                      'Estabilidade:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(

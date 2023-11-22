@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                       'assets/images/unisc_logo.png',
                       height: 100,
                     ),
-                    const Text("Calculdora de Medicamentos",
+                    const Text("Calculadora de Medicamentos",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 18)),

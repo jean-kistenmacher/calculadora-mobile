@@ -11,6 +11,9 @@ class ResultPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
+        iconTheme: IconThemeData(
+          color: Colors.white, // Change the back icon color here
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(

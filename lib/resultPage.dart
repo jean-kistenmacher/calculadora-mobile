@@ -47,7 +47,7 @@ class ResultPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            "Aspirar ${resultado.aspirar}ml de solução para atingir os ${resultado.dose}mg da dose prescrita",
+                            "Aspirar ${resultado.aspirar}ml de solução para atingir os ${resultado.dose}(mg ou UI) da dose prescrita",
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                                 color: Colors.white,

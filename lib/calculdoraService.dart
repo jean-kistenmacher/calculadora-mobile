@@ -55,6 +55,60 @@ class Apresentacao {
   }
 }
 
+class FormCalculo {
+  final int idApresentacao;
+  final int idVia;
+  final int idAcesso;
+  final String dose;
+
+  const FormCalculo(
+      {required this.idApresentacao,
+      required this.idVia,
+      required this.idAcesso,
+      required this.dose});
+}
+
+class Resultado {
+  int? id;
+  String? reconstituicao;
+  String? diluicao;
+  String? concentracao;
+  String? estabilidade;
+  String? tempoAdm;
+  String? observacao;
+  String? aspirar;
+  String? dose;
+  bool naoEncontrado;
+
+  Resultado(
+      {this.id,
+      this.reconstituicao,
+      this.diluicao,
+      this.concentracao,
+      this.estabilidade,
+      this.tempoAdm,
+      this.observacao,
+      this.aspirar,
+      this.dose,
+      this.naoEncontrado = false});
+
+  Resultado.customConstructor(bool this.naoEncontrado);
+
+  factory Resultado.fromJson(Map<String, dynamic> json) {
+    return Resultado(
+      id: json['id'],
+      reconstituicao: json['reconstituicao'],
+      diluicao: json['diluicao'],
+      concentracao: json['concentracao'],
+      estabilidade: json['estabilidade'],
+      tempoAdm: json['tempo_adm'],
+      observacao: json['observacao'],
+      aspirar: json['aspirar'],
+      dose: json['dose'],
+    );
+  }
+}
+
 class CalculadoraService {
   final base_url = 'https://api.jkist.com.br';
 
@@ -126,6 +180,40 @@ class CalculadoraService {
         acesso.add(Acesso.fromJson(entrada));
       }
       return acesso;
+    } else {
+      throw Exception('Falha ao buscar acessos.');
+    }
+  }
+
+  Future<Resultado> calcularDiluicao(FormCalculo form) async {
+    print(form);
+
+    Map<String, dynamic> jsonData = {
+      'idMedicamento': form.idApresentacao,
+      'idVia': form.idVia,
+      'idAcesso': form.idAcesso,
+      'dose': form.dose
+    };
+
+    final response = await http.post(Uri.parse('$base_url/calculoDiluicao'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(jsonData));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      if (data.containsKey('naoEncontrado')) {
+        if (data.naoEncontrado) {
+          final Resultado resultadoNaoEncontrado =
+              Resultado.customConstructor(true);
+          return resultadoNaoEncontrado;
+        }
+      }
+
+      final Resultado resultado = Resultado.fromJson(data);
+      return resultado;
     } else {
       throw Exception('Falha ao buscar acessos.');
     }

@@ -2,9 +2,9 @@ import 'package:calculadora_mobile/calculdoraService.dart';
 import 'package:flutter/material.dart';
 
 class ResultPage extends StatelessWidget {
-  final Medicamento medicamento;
+  final Resultado resultado;
 
-  const ResultPage({Key? key, required this.medicamento});
+  const ResultPage({Key? key, required this.resultado});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,9 @@ class ResultPage extends StatelessWidget {
             const SizedBox(
               height: 30,
             ),
-            Text(medicamento.nome)
+            Text(resultado.naoEncontrado
+                ? "Resultado não encontrado"
+                : "Aspirar ${resultado.dose}ml")
           ],
         ),
       ),

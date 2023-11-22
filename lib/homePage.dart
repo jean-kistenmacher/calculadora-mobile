@@ -1,5 +1,6 @@
 import 'package:calculadora_mobile/calculdoraService.dart';
 import 'package:calculadora_mobile/resultPage.dart';
+import 'package:calculadora_mobile/loading.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,6 +18,8 @@ class _HomePageState extends State<HomePage> {
 
   final TextEditingController medicamentoController = TextEditingController();
 
+  bool isLoading = false;
+
   Medicamento? selectedMedicamento;
   Apresentacao? selectedApresentacao;
   Via? selectedVia;
@@ -33,181 +36,184 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue[900],
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              Image.asset(
-                'assets/images/unisc_logo.png',
-                height: 100,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Text("Calculdora de Medicamentos",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              const SizedBox(
-                height: 10,
-              ),
-              FutureBuilder<List<Medicamento>>(
-                  future: futureMedicamentos,
-                  builder: ((context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData) {
-                      return DropdownMenu<Medicamento>(
-                        width: 300,
-                        enableFilter: true,
-                        enableSearch: true,
-                        controller: medicamentoController,
-                        requestFocusOnTap: true,
-                        label: const Text("Medicamento"),
-                        onSelected: (Medicamento? newValue) async {
-                          getApresentacoesSetValue(newValue);
-                        },
-                        dropdownMenuEntries: snapshot.data
-                            .map<DropdownMenuEntry<Medicamento>>(
-                                (Medicamento medicamento) {
-                          return DropdownMenuEntry<Medicamento>(
-                            value: medicamento,
-                            label: medicamento.nome,
-                          );
-                        }).toList(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('ERROR: ${snapshot.error}');
-                    }
-                    return const CircularProgressIndicator();
-                  })),
-              const SizedBox(
-                height: 10,
-              ),
-              FutureBuilder<List<Apresentacao>>(
-                  future: futureApresentacoes,
-                  builder: ((context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData) {
-                      return DropdownMenu<Apresentacao>(
-                        width: 300,
-                        label: snapshot.data.length == 0
-                            ? const Text('Selecione um Medicamento')
-                            : const Text('Apresentação'),
-                        onSelected: (Apresentacao? newValue) {
-                          setState(() {
-                            selectedApresentacao = newValue;
-                          });
-                        },
-                        dropdownMenuEntries: snapshot.data
-                            .map<DropdownMenuEntry<Apresentacao>>(
-                                (Apresentacao apresentacao) {
-                          return DropdownMenuEntry<Apresentacao>(
-                            value: apresentacao,
-                            label:
-                                "${apresentacao.marca} - ${apresentacao.laboratorio} - ${apresentacao.qtdApresentacao}",
-                          );
-                        }).toList(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('ERROR: ${snapshot.error}');
-                    }
-                    return const CircularProgressIndicator();
-                  })),
-              const SizedBox(
-                height: 10,
-              ),
-              FutureBuilder<List<Via>>(
-                  future: futureVias,
-                  builder: ((context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData) {
-                      return DropdownMenu<Via>(
-                        width: 300,
-                        label: const Text("Via de Administração"),
-                        onSelected: (Via? newValue) {
-                          setState(() {
-                            selectedVia = newValue;
-                          });
-                        },
-                        dropdownMenuEntries: snapshot.data
-                            .map<DropdownMenuEntry<Via>>((Via via) {
-                          return DropdownMenuEntry<Via>(
-                            value: via,
-                            label: via.nome,
-                          );
-                        }).toList(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('ERROR: ${snapshot.error}');
-                    }
-                    return const CircularProgressIndicator();
-                  })),
-              const SizedBox(
-                height: 10,
-              ),
-              FutureBuilder<List<Acesso>>(
-                  future: futureAcessos,
-                  builder: ((context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData) {
-                      return DropdownMenu<Acesso>(
-                        width: 300,
-                        label: const Text("Acesso"),
-                        onSelected: (Acesso? newValue) {
-                          setState(() {
-                            selectedAcesso = newValue;
-                          });
-                        },
-                        dropdownMenuEntries: snapshot.data
-                            .map<DropdownMenuEntry<Acesso>>((Acesso acesso) {
-                          return DropdownMenuEntry<Acesso>(
-                            value: acesso,
-                            label: acesso.nome,
-                          );
-                        }).toList(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('ERROR: ${snapshot.error}');
-                    }
-                    return const CircularProgressIndicator();
-                  })),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: 300,
-                child: TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      dosePrescrita = value;
-                    });
-                  },
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Dose prescrita',
-                      suffixText: '(mg|UI)'),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              FilledButton(
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 100, vertical: 20),
-                  ),
-                  onPressed: () => {calculate(context, selectedMedicamento!)},
-                  child: const Text(
-                    'Calcular',
-                    style: TextStyle(fontSize: 16),
-                  )),
-            ],
+  Widget build(BuildContext context) => isLoading
+      ? const LoadingPage()
+      : Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.blue[900],
           ),
-        ),
-      ),
-    );
-  }
+          body: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset(
+                    'assets/images/unisc_logo.png',
+                    height: 100,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text("Calculdora de Medicamentos",
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  FutureBuilder<List<Medicamento>>(
+                      future: futureMedicamentos,
+                      builder: ((context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          return DropdownMenu<Medicamento>(
+                            width: 300,
+                            enableFilter: true,
+                            enableSearch: true,
+                            controller: medicamentoController,
+                            requestFocusOnTap: true,
+                            label: const Text("Medicamento"),
+                            onSelected: (Medicamento? newValue) async {
+                              getApresentacoesSetValue(newValue);
+                            },
+                            dropdownMenuEntries: snapshot.data
+                                .map<DropdownMenuEntry<Medicamento>>(
+                                    (Medicamento medicamento) {
+                              return DropdownMenuEntry<Medicamento>(
+                                value: medicamento,
+                                label: medicamento.nome,
+                              );
+                            }).toList(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('ERROR: ${snapshot.error}');
+                        }
+                        return const CircularProgressIndicator();
+                      })),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  FutureBuilder<List<Apresentacao>>(
+                      future: futureApresentacoes,
+                      builder: ((context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          return DropdownMenu<Apresentacao>(
+                            width: 300,
+                            label: snapshot.data.length == 0
+                                ? const Text('Selecione um Medicamento')
+                                : const Text('Apresentação'),
+                            onSelected: (Apresentacao? newValue) {
+                              setState(() {
+                                selectedApresentacao = newValue;
+                              });
+                            },
+                            dropdownMenuEntries: snapshot.data
+                                .map<DropdownMenuEntry<Apresentacao>>(
+                                    (Apresentacao apresentacao) {
+                              return DropdownMenuEntry<Apresentacao>(
+                                value: apresentacao,
+                                label:
+                                    "${apresentacao.marca} - ${apresentacao.laboratorio} - ${apresentacao.qtdApresentacao}",
+                              );
+                            }).toList(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('ERROR: ${snapshot.error}');
+                        }
+                        return const CircularProgressIndicator();
+                      })),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  FutureBuilder<List<Via>>(
+                      future: futureVias,
+                      builder: ((context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          return DropdownMenu<Via>(
+                            width: 300,
+                            label: const Text("Via de Administração"),
+                            onSelected: (Via? newValue) {
+                              setState(() {
+                                selectedVia = newValue;
+                              });
+                            },
+                            dropdownMenuEntries: snapshot.data
+                                .map<DropdownMenuEntry<Via>>((Via via) {
+                              return DropdownMenuEntry<Via>(
+                                value: via,
+                                label: via.nome,
+                              );
+                            }).toList(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('ERROR: ${snapshot.error}');
+                        }
+                        return const CircularProgressIndicator();
+                      })),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  FutureBuilder<List<Acesso>>(
+                      future: futureAcessos,
+                      builder: ((context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          return DropdownMenu<Acesso>(
+                            width: 300,
+                            label: const Text("Acesso"),
+                            onSelected: (Acesso? newValue) {
+                              setState(() {
+                                selectedAcesso = newValue;
+                              });
+                            },
+                            dropdownMenuEntries: snapshot.data
+                                .map<DropdownMenuEntry<Acesso>>(
+                                    (Acesso acesso) {
+                              return DropdownMenuEntry<Acesso>(
+                                value: acesso,
+                                label: acesso.nome,
+                              );
+                            }).toList(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('ERROR: ${snapshot.error}');
+                        }
+                        return const CircularProgressIndicator();
+                      })),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: 300,
+                    child: TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          dosePrescrita = value;
+                        });
+                      },
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Dose prescrita',
+                          suffixText: '(mg|UI)'),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  FilledButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 100, vertical: 20),
+                      ),
+                      onPressed: () =>
+                          {calculate(context, selectedMedicamento!)},
+                      child: const Text(
+                        'Calcular',
+                        style: TextStyle(fontSize: 16),
+                      )),
+                ],
+              ),
+            ),
+          ),
+        );
 
   getApresentacoesSetValue(newValue) async {
     CalculadoraService()
@@ -223,10 +229,26 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  calculate(context, Medicamento medicamento) {
+  calculate(context, Medicamento medicamento) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    FormCalculo form = FormCalculo(
+        idApresentacao: selectedApresentacao!.id,
+        idVia: selectedVia!.id,
+        idAcesso: selectedAcesso!.id,
+        dose: dosePrescrita);
+
+    Resultado resultado = await CalculadoraService().calcularDiluicao(form);
+
+    setState(() {
+      isLoading = false;
+    });
+
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ResultPage(medicamento: medicamento)));
+            builder: (context) => ResultPage(resultado: resultado)));
   }
 }

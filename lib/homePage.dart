@@ -85,7 +85,12 @@ class _HomePageState extends State<HomePage> {
                           } else if (snapshot.hasError) {
                             return Text('ERROR: ${snapshot.error}');
                           }
-                          return const CircularProgressIndicator();
+                          return const DropdownMenu<String>(
+                            width: 300,
+                            label: Text("Medicamento"),
+                            dropdownMenuEntries: [],
+                            enabled: false,
+                          );
                         })),
                     const SizedBox(
                       height: 10,
@@ -117,7 +122,12 @@ class _HomePageState extends State<HomePage> {
                           } else if (snapshot.hasError) {
                             return Text('ERROR: ${snapshot.error}');
                           }
-                          return const CircularProgressIndicator();
+                          return const DropdownMenu<String>(
+                            width: 300,
+                            label: Text("Selecione um Medicamento"),
+                            dropdownMenuEntries: [],
+                            enabled: false,
+                          );
                         })),
                     const SizedBox(
                       height: 10,
@@ -145,7 +155,12 @@ class _HomePageState extends State<HomePage> {
                           } else if (snapshot.hasError) {
                             return Text('ERROR: ${snapshot.error}');
                           }
-                          return const CircularProgressIndicator();
+                          return const DropdownMenu<String>(
+                            width: 300,
+                            label: Text("Via de Administração"),
+                            dropdownMenuEntries: [],
+                            enabled: false,
+                          );
                         })),
                     const SizedBox(
                       height: 10,
@@ -174,7 +189,13 @@ class _HomePageState extends State<HomePage> {
                           } else if (snapshot.hasError) {
                             return Text('ERROR: ${snapshot.error}');
                           }
-                          return const CircularProgressIndicator();
+                          return const DropdownMenu<String>(
+                            width: 300,
+                            label: Text("Via de Administração"),
+                            dropdownMenuEntries: [],
+                            enabled: false,
+                          );
+                          ;
                         })),
                     const SizedBox(
                       height: 10,
@@ -188,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             hintText: 'Dose prescrita',
                             suffixText: '(mg ou UI)'),

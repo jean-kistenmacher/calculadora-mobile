@@ -189,7 +189,7 @@ class CalculadoraService {
     print(form);
 
     Map<String, dynamic> jsonData = {
-      'idMedicamento': form.idApresentacao,
+      'idApresentacao': form.idApresentacao,
       'idVia': form.idVia,
       'idAcesso': form.idAcesso,
       'dose': form.dose
